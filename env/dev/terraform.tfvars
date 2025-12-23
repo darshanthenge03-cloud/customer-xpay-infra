@@ -1,0 +1,6 @@
+vm_name        = "xpay-vm01"
+location       = "Central India"
+resource_group = "rg-xpay-dev"
+vm_size        = "Standard_B2s"
+nic_id         = "/subscriptions/XXXX/resourceGroups/rg-network/providers/Microsoft.Network/networkInterfaces/nic01"
+ssh_public_key = "ssh-rsa AAAA..."
