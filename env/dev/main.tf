@@ -4,6 +4,11 @@ provider "azurerm" {
   resource_provider_registrations = "none"
 }
 
+resource "azurerm_resource_group" "rg" {
+  name     = var.resource_group
+  location = var.location
+}
+
 module "vm" {
   source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//vm"
 
