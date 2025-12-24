@@ -27,3 +27,17 @@ module "network" {
     private-b = "10.0.12.0/24"
   }
 }
+
+module "vm" {
+  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//vm"
+
+  vm_name             = var.vm_name
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  vm_size             = var.vm_size
+  admin_username      = var.admin_username
+  ssh_public_key      = var.ssh_public_key
+
+  # 👇 VM goes into PRIVATE subnet
+  subnet_id = module.network.private_subnet_ids["private-a"]
+}
