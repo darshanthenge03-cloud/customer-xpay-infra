@@ -40,11 +40,6 @@ data "azurerm_key_vault_secret" "test" {
   key_vault_id = azurerm_key_vault.kv.id
 }
 
-output "keyvault_secret_loaded" {
-  value     = length(data.azurerm_key_vault_secret.test.value) > 0
-  sensitive = true
-}
-
 module "network" {
   source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//network"
 
