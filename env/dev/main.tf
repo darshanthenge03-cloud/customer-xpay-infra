@@ -40,6 +40,16 @@ data "azurerm_key_vault_secret" "test" {
   key_vault_id = azurerm_key_vault.kv.id
 }
 
+resource "azurerm_key_vault_access_policy" "vm" {
+  key_vault_id = azurerm_key_vault.kv.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = module.vm.vm_principal_id
+
+  secret_permissions = [
+    "Get"
+  ]
+}
+
 module "network" {
   source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//network"
 
