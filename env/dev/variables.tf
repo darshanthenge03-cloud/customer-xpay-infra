@@ -2,11 +2,14 @@ variable "location" {
   type = string
 }
 
-variable "resource_group" {
+variable "resource_group_name" {
   type = string
 }
 
-variable "vm_name" {}
-variable "vm_size" {}
-variable "admin_username" {}
-variable "ssh_public_key" {}
+variable "vm_admin_username" {
+  type = string
+}
+
+variable "ssh_public_key" {
+  type = string
+}

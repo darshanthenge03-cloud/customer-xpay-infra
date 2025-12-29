@@ -1,89 +1,97 @@
 provider "azurerm" {
   features {}
-  resource_provider_registrations = "none"
 }
 
-data "azurerm_client_config" "current" {}
-
+# --------------------
+# Resource Group
+# --------------------
 resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group
+  name     = var.resource_group_name
   location = var.location
 }
 
-resource "azurerm_key_vault" "kv" {
-  name                = "kv-xpay-dev-001"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  tenant_id = data.azurerm_client_config.current.tenant_id
-  sku_name  = "standard"
-
-  soft_delete_retention_days = 7
-  purge_protection_enabled   = false
-}
-
-resource "azurerm_key_vault_access_policy" "terraform" {
-  key_vault_id = azurerm_key_vault.kv.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = data.azurerm_client_config.current.object_id
-
-  secret_permissions = [
-    "Get",
-    "List",
-    "Set",
-    "Delete"
-  ]
-}
-
-data "azurerm_key_vault_secret" "test" {
-  name         = "test-secret"
-  key_vault_id = azurerm_key_vault.kv.id
-}
-
-resource "azurerm_key_vault_access_policy" "vm" {
-  key_vault_id = azurerm_key_vault.kv.id
-  tenant_id    = data.azurerm_client_config.current.tenant_id
-  object_id    = module.vm.vm_principal_id
-
-  secret_permissions = [
-    "Get"
-  ]
-}
-
+# --------------------
+# Network
+# --------------------
 module "network" {
-  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//network"
-
-  vnet_name           = "xpay-vnet"
-  location            = var.location
+  source              = "git::https://github.com/ORG/terraform-azure-modules.git//network"
   resource_group_name = azurerm_resource_group.rg.name
-
-  vnet_address_space = ["10.0.0.0/16"]
+  location            = var.location
+  vnet_cidr           = "10.10.0.0/16"
 
   public_subnets = {
-    public-a = "10.0.1.0/24"
-    public-b = "10.0.2.0/24"
+    public-a = "10.10.1.0/24"
+    public-b = "10.10.2.0/24"
   }
 
   private_subnets = {
-    private-a = "10.0.11.0/24"
-    private-b = "10.0.12.0/24"
+    private-a = "10.10.10.0/24"
+    private-b = "10.10.11.0/24"
   }
 
-  # Enable Bastion Host
-  enable_bastion         = true
-  bastion_subnet_prefix  = "10.0.100.0/26"
+  bastion_subnet_cidr = "10.10.255.0/27"
 }
 
-module "vm" {
-  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//vm"
-
-  vm_name             = var.vm_name
-  location            = var.location
+# --------------------
+# Key Vault
+# --------------------
+module "keyvault" {
+  source              = "git::https://github.com/ORG/terraform-azure-modules.git//keyvault"
   resource_group_name = azurerm_resource_group.rg.name
-  vm_size             = var.vm_size
-  admin_username      = var.admin_username
-  ssh_public_key      = var.ssh_public_key
+  location            = var.location
+  key_vault_name      = "kv-xpay-dev"
 
-  # 👇 VM goes into PRIVATE subnet
-  subnet_id = module.network.private_subnet_ids["private-a"]
+  access_policies = [
+    {
+      object_id  = module.vm.vm_principal_id
+      permissions = ["Get", "List"]
+    }
+  ]
+}
+
+# --------------------
+# VM
+# --------------------
+module "vm" {
+  source              = "git::https://github.com/ORG/terraform-azure-modules.git//vm"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+
+  vm_name        = "xpay-vm01"
+  vm_size        = "Standard_B2s"
+  subnet_id      = module.network.private_subnet_ids["private-a"]
+  admin_username = var.vm_admin_username
+  os_type        = "linux"
+
+  ssh_public_key = var.ssh_public_key
+
+  image = {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+}
+
+# --------------------
+# Bastion
+# --------------------
+module "bastion" {
+  source              = "git::https://github.com/ORG/terraform-azure-modules.git//bastion"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+  bastion_subnet_id   = module.network.bastion_subnet_id
+}
+
+# --------------------
+# Backup
+# --------------------
+module "backup" {
+  source              = "git::https://github.com/ORG/terraform-azure-modules.git//backup"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+
+  vault_name     = "rsv-xpay-dev"
+  retention_days = 7
+  vm_id          = module.vm.vm_id
 }
