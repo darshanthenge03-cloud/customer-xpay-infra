@@ -85,5 +85,5 @@ State is stored remotely using Azure Storage with locking enabled.
 
 ## Backup Strategy
 - Daily backups at scheduled time
-- 30-day retention
+- 7-day retention
 - 5-day instant snapshot restore for fast recovery
