@@ -62,15 +62,10 @@ module "vm" {
   subnet_id      = module.network.private_subnet_ids["private-a"]
   admin_username = var.vm_admin_username
   os_type        = "linux"
+  os_flavor      = "ubuntu-22.04"
 
   ssh_public_key = var.ssh_public_key
 
-  image = {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
-  }
 }
 
 # --------------------
