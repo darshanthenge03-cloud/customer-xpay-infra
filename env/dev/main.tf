@@ -36,7 +36,7 @@ module "network" {
 # Key Vault
 # --------------------
 module "keyvault" {
-  source              = "git::https://github.com/ORG/terraform-azure-modules.git//keyvault"
+  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//keyvault"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
   key_vault_name      = "kv-xpay-dev"
@@ -53,7 +53,7 @@ module "keyvault" {
 # VM
 # --------------------
 module "vm" {
-  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules/tree/342b694a7d71598788b95f874fe1136322c887ad/vm"
+  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//vm"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
 
@@ -77,7 +77,7 @@ module "vm" {
 # Bastion
 # --------------------
 module "bastion" {
-  source              = "git::https://github.com/ORG/terraform-azure-modules.git//bastion"
+  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//bastion"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
   bastion_subnet_id   = module.network.bastion_subnet_id
@@ -87,7 +87,7 @@ module "bastion" {
 # Backup
 # --------------------
 module "backup" {
-  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules/tree/342b694a7d71598788b95f874fe1136322c887ad/backup"
+  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//backup"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
 
