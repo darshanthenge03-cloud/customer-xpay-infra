@@ -14,7 +14,7 @@ resource "azurerm_resource_group" "rg" {
 # Network
 # --------------------
 module "network" {
-  source              = "git::https://github.com/ORG/terraform-azure-modules.git//network"
+  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules/tree/342b694a7d71598788b95f874fe1136322c887ad/network"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
   vnet_cidr           = "10.10.0.0/16"
@@ -53,7 +53,7 @@ module "keyvault" {
 # VM
 # --------------------
 module "vm" {
-  source              = "git::https://github.com/ORG/terraform-azure-modules.git//vm"
+  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules/tree/342b694a7d71598788b95f874fe1136322c887ad/vm"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
 
@@ -87,7 +87,7 @@ module "bastion" {
 # Backup
 # --------------------
 module "backup" {
-  source              = "git::https://github.com/ORG/terraform-azure-modules.git//backup"
+  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules/tree/342b694a7d71598788b95f874fe1136322c887ad/backup"
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
 
