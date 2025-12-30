@@ -14,7 +14,9 @@ resource "azurerm_resource_group" "rg" {
 # Network
 # --------------------
 module "network" {
-  source              = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//network?ref=342b694a7d71598788b95f874fe1136322c887ad"
+  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//network?ref=main"
+  # or ref=v1.0.0 AFTER tagging
+
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
   vnet_cidr           = "10.10.0.0/16"
@@ -30,6 +32,7 @@ module "network" {
   }
 
   bastion_subnet_cidr = "10.10.255.0/27"
+  gateway_subnet_cidr = "10.10.254.0/27"
 }
 
 # --------------------
