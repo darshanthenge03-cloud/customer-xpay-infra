@@ -103,6 +103,4 @@ module "vpngateway" {
   location            = var.location
 
   gateway_subnet_id = module.network.gateway_subnet_id
-
-  shared_key = var.vpn_shared_key
 }
