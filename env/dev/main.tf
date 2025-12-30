@@ -93,3 +93,16 @@ module "backup" {
   retention_days = 7
   vm_id          = module.vm.vm_id
 }
+# --------------------
+# VPNGateway
+# --------------------
+module "vpngateway" {
+  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//vpngateway?ref=main"
+
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = var.location
+
+  gateway_subnet_id = module.network.gateway_subnet_id
+
+  shared_key = var.vpn_shared_key
+}
