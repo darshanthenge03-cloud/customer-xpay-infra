@@ -13,3 +13,9 @@ variable "vm_admin_username" {
 variable "ssh_public_key" {
   type = string
 }
+
+variable "static_web_app_name" {}
+
+variable "tags" {
+  type = map(string)
+}
