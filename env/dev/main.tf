@@ -17,7 +17,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "staticwebapp" {
-  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//static-web-app"
+  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//staticwebapp"
 
   name                = "customer-static-webapp"
   resource_group_name = azurerm_resource_group.rg.name
