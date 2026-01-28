@@ -1,4 +1,6 @@
 name: Terraform Deploy (Dev)
+- name: Force unlock Terraform
+  run: terraform force-unlock -force 897eda4e-39b8-1ac4-d8d4-0a248dd6d860
 
 on:
   push:
