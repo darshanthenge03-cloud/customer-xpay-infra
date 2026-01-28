@@ -16,7 +16,7 @@ resource "azurerm_resource_group" "rg" {
   location = "East Asia"
 }
 
-module "static_web_app" {
+module "staticwebapp" {
   source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//static-web-app"
 
   name                = "customer-static-webapp"
