@@ -1,6 +1,4 @@
 name: Terraform Deploy (Dev)
-- name: Force unlock Terraform
-  run: terraform force-unlock -force 897eda4e-39b8-1ac4-d8d4-0a248dd6d860
 
 on:
   push:
@@ -17,6 +15,10 @@ on:
           - apply
           - destroy
 
+concurrency:
+  group: terraform-dev
+  cancel-in-progress: true
+
 env:
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
@@ -24,60 +26,35 @@ env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
 jobs:
-  terraform-plan:
-    name: Terraform Plan
+  terraform:
     runs-on: ubuntu-latest
     environment: dev
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v2
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
 
       - name: Terraform Init
         working-directory: env/dev
         run: terraform init
+
+      - name: Terraform Validate
+        working-directory: env/dev
+        run: terraform validate
 
       - name: Terraform Plan
         working-directory: env/dev
-        run: terraform plan
-
-  terraform-apply:
-    name: Terraform Apply
-    runs-on: ubuntu-latest
-    environment: dev
-    needs: terraform-plan
-    if: github.event.inputs.action != 'destroy'
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: hashicorp/setup-terraform@v2
-
-      - name: Terraform Init
-        working-directory: env/dev
-        run: terraform init
+        run: terraform plan -out=tfplan
 
       - name: Terraform Apply
+        if: github.event.inputs.action != 'destroy'
         working-directory: env/dev
-        run: terraform apply -auto-approve
-
-  terraform-destroy:
-    name: Terraform Destroy (Manual Approval)
-    runs-on: ubuntu-latest
-    environment: destroy-approval
-    needs: terraform-plan
-    if: github.event.inputs.action == 'destroy'
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: hashicorp/setup-terraform@v2
-
-      - name: Terraform Init
-        working-directory: env/dev
-        run: terraform init
+        run: terraform apply -auto-approve tfplan
 
       - name: Terraform Destroy
+        if: github.event.inputs.action == 'destroy'
         working-directory: env/dev
         run: terraform destroy -auto-approve
