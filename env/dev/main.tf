@@ -1,16 +1,30 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.100"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
-module "staticwebapp" {
-  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//staticwebapp?ref=main"
-
-  name                = var.static_web_app_name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-
-  tags = var.tags
+resource "azurerm_resource_group" "rg" {
+  name     = "rg-customer-web"
+  location = "East Asia"
 }
 
+module "static_web_app" {
+  source = "git::https://github.com/darshanthenge03-cloud/terraform-azure-modules.git//static-web-app"
 
+  name                = "customer-static-webapp"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
 
+  tags = {
+    environment = "prod"
+    owner       = "customer"
+  }
+}
